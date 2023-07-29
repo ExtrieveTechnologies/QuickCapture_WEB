@@ -6,4 +6,4 @@ QuickCapture Web Scanning SDK-JS library Specially designed for Web applications
 - [Fultter Plugin](https://pub.dev/packages/quickcapture)
 
   
-# Updating soon..
+# Releasing soon..
