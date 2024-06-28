@@ -1,4 +1,4 @@
-# QuickCapture Web 2.0.0
+# QuickCapture Web 2.0
 QuickCapture Web Scanning SDK-JS Imaging viewer library Specially designed for Web applications from Extrieve.
 
 > It's not "**just**" a JS/web scanning Library. It's a "**document**" scanning/capture SDK evolved with **Best Quality**, **Highest Possible Compression**, **Image Optimisation**, of output document in mind.
