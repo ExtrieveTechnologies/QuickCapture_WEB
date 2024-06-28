@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>QuickCapture Web | Demo | Extrieve</title>
+    <link rel="icon" href="https://i.ibb.co/fn31Z0x/logo.png" sizes="32x32">
+
+    <!--Styles for demo application-->
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col rightCol">
+                <div>---------From File---------</div>
+                <a href="#" onclick="HaveScanAppEvent('appendfromfile')">Append from file</a><br>
+                <a href="#" onclick="HaveScanAppEvent('insertbeforecurrentpage')">Insert before page</a><br>
+                <a href="#" onclick="HaveScanAppEvent('insertaftercurrentpage')">Insert after page</a><br>
+                <a href="#" onclick="HaveScanAppEvent('replacecurrentpage')">Replace current page</a><br>
+                <a href="#" onclick="HaveScanAppEvent('appendfromfolder')">Append from folder</a><br>
+                <div>-------From Scanner-------</div>
+                <a href="#" onclick="HaveScanAppEvent('selectscanner')">Select scanner device</a><br>
+                <a href="#" onclick="HaveScanAppEvent('append')">Append from scanner</a><br>
+                <a href="#" onclick="HaveScanAppEvent('insertbefore')">Insert before page</a><br>
+                <a href="#" onclick="HaveScanAppEvent('insertafter')">Insert after page</a><br>
+                <a href="#" onclick="HaveScanAppEvent('replace')">Replace current page</a><br>
+                <div>------Transformations------</div>
+                <a href="#" onclick="HaveScanAppEvent('invertimage')">Invert image</a><br>
+                <a href="#" onclick="HaveScanAppEvent('blackandwhite')">Black & white</a><br>
+                <a href="#" onclick="HaveScanAppEvent('grayimage')">Gray image</a><br>
+                <a href="#" onclick="HaveScanAppEvent('autodespeckle')">Auto despeckle</a><br>
+                <a href="#" onclick="HaveScanAppEvent('rotate')">Rotate image</a><br>
+                <div>------Enhancements------</div>
+                <a href="#" onclick="HaveScanAppEvent('imageenhance', 'brightness')">Brightness</a><br>
+                <a href="#" onclick="HaveScanAppEvent('imageenhance', 'contrast')">Contrast</a><br>
+                <a href="#" onclick="HaveScanAppEvent('imageenhance', 'smoothing')">Smoothing</a><br>
+                <a href="#" onclick="HaveScanAppEvent('imageenhance', 'dilate')">Dilate</a><br>
+                <a href="#" onclick="HaveScanAppEvent('imageenhance', 'erode')">Erode</a><br>
+                <a href="#" onclick="HaveScanAppEvent('imageenhance', 'sharpen')">Sharpen</a><br>
+                <a href="#" onclick="HaveScanAppEvent('imageenhance', 'removeborder')">Remove border</a><br>
+                <div>-------Annotations-------</div>
+                <a href="#" onclick="HaveScanAppEvent('extract')">Crop & append</a><br>
+                <a href="#" onclick="HaveScanAppEvent('cropopenimage')">Crop & open image</a><br>
+                <a href="#" onclick="HaveScanAppEvent('textannotate')">Text annotate</a><br>
+                <a href="#" onclick="HaveScanAppEvent('fillcolor')">Fill color inside</a><br>
+                <a href="#" onclick="HaveScanAppEvent('fillcoloroutside')">Fill color outside</a><br>
+                <a href="#" onclick="HaveScanAppEvent('autodeskew')">Auto deskew</a><br>
+                <div>--------Zoom/Pan--------</div>
+                <a href="#" onclick="HaveScanAppEvent('zoomfactor')">Set zoom factor</a><br>
+                <a href="#" onclick="HaveScanAppEvent('zoommouse')">Set zoom mouse</a><br>
+                <a href="#" onclick="HaveScanAppEvent('panmouse')">Set pan mouse</a><br>
+                <a href="#" onclick="HaveScanAppEvent('maginifier')">Set magnifier</a><br>
+                <a href="#" onclick="HaveScanAppEvent('resetmousetool')">Reset mouse tool</a>
+                <div>--------Information--------</div>
+                <a href="#" onclick="HaveScanAppEvent('currentpgbpp')">Show current page bpp</a>
+                <a href="#" onclick="HaveScanAppEvent('currentimageinfo')">Show current image info</a><br>
+                <a href="#" onclick="HaveScanAppEvent('allfileinfo')">Show all file info</a><br>
+                <a href="#" onclick="HaveScanAppEvent('setpageattr')">Set Page Attribute</a><br>
+                <a href="#" onclick="HaveScanAppEvent('getpageattr')">Get Page Attribute</a><br>
+                <a href="#" onclick="HaveScanAppEvent('licenseinfo')">Get license info</a><br>
+                <div>-------Remove Page-------</div>
+                <a href="#" onclick="HaveScanAppEvent('discard')">Discard current page</a><br>
+                <a href="#" onclick="HaveScanAppEvent('discardall')">Discard all page</a><br>
+                <div>-------Output Build-------</div>
+                <a href="#" onclick="HaveScanAppEvent('saveoutput')">Save normal tif</a><br>
+                <a href="#" onclick="HaveScanAppEvent('imagestamping')">Save stamped tif</a><br>
+                <a href="#" onclick="HaveScanAppEvent('filenamesize')">Get file name & size</a><br>
+                <a href="#" onclick="HaveScanAppEvent('print')">Print current page</a><br>
+                <div>----Upload/Download----</div>
+                <a href="#" onclick="DownloadToViewer(true, true)">Download to viewer</a><br>
+                <a href="#" onclick="UploadImage()">Upload from viewer</a><br>
+                <div>----HttpTwain Installer----</div>
+                <a href="#" onclick="HaveScanAppEvent('downloadinstaller')">Download twain installer</a>
+                <a href="#" onclick="HaveScanAppEvent('triggerservice')">Trigger service from web</a><br>
+                <div>-------Second Viewer------</div>
+                <a href="#" onclick="loadNewViewerInstance()">Open viewer instance</a><br>
+                <div>-------Documentation------</div>
+                <a href="build/documentation.html" target="_blank">Open Documentation</a><br>
+            </div>
+
+            <div class="col-10">
+                <div id="ImgViewerRoot"></div>
+                <div id="ImgViewerRoot2"></div>
+                <div id="imginfocontent">
+                    <h6>Current Image Information</h6>
+                    <table>
+                        <thead>
+                            <tr id="setimageinfoheader">
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="setimageinfodata">
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="fileinfocontent">
+                    <h6>Appended File Information</h6>
+                    <table>
+                        <thead>
+                            <tr id="setfileinfoheader">
+                            </tr>
+                        </thead>
+                        <tbody id="setfileinfodata">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="uinput" style="position:absolute;left:17%;top:270px;z-index:150;display:none;width:450px;">
+        <form id="formuInput" name="formuInput">
+            <table class="tableCenter" style="width:100%;">
+                <tr>
+                    <td colspan="5" class="dataTableHeading">Extract option</td>
+                </tr>
+                <tr>
+                    <td class="filterRowInfoText"><input type="radio" id="radio" name="optvals" value="append" /> Append
+                    </td>
+                    <td class="filterRowInfoText"><input type="radio" id="radio2" name="optvals" value="insertbefore" />
+                        InsertBefore</td>
+                    <td class="filterRowInfoText"><input type="radio" id="radio3" name="optvals" value="insertafter" />
+                        InsertAfter
+                    </td>
+                    <td class="filterRowInfoText"><input type="radio" id="optval" name="optvals" value="overwrite" />
+                        Overwrite
+                    </td>
+                    <td class="filterRowInfoText">
+                        <input type="button" class="button" id="uinputok" name="uinputok" value="Ok"
+                            onclick="CloseUserInput(1)">
+                        <input type="button" class="button" id="uinputcancel" name="uinputcancel" value="Cancel"
+                            onclick="CloseUserInput(0)">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <div id="zoominput" style="position:absolute;left:17%;top:270px;z-index:150;display:none;width:450px;">
+        <form id="zoomuInput" name="zoomuInput">
+            <table class="tableCenter" style="width:100%;">
+                <tr>
+                    <td colspan="7" class="dataTableHeading">Zoom Factor with zoom</td>
+                </tr>
+                <tr>
+                    <td class="filterRowInfoText"><input type="radio" id="radio" name="zoomvals" value="0" /> 0%
+                    </td>
+                    <td class="filterRowInfoText"><input type="radio" id="radio" name="zoomvals" value="50" /> 50%
+                    </td>
+                    <td class="filterRowInfoText"><input type="radio" id="radio1" name="zoomvals" value="100" />
+                        100%</td>
+                    <td class="filterRowInfoText"><input type="radio" id="radio2" name="zoomvals" value="150" />
+                        150%
+                    </td>
+                    <td class="filterRowInfoText"><input type="radio" id="radio3" name="zoomvals" value="200" />
+                        200%
+                    </td>
+                    <td class="filterRowInfoText"><input type="radio" id="radio4" name="zoomvals" value="300" />
+                        300%
+                    </td>
+                    <td class="filterRowInfoText">
+                        <input type="button" class="button" id="zinputok" name="zinputok" value="Ok"
+                            onclick="CloseZoomInput(1)">
+                        <input type="button" class="button" id="zinputcancel" name="zinputcancel" value="Reset"
+                            onclick="CloseZoomInput(0)">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <div id="textannotati" style="position:absolute;left:18%;top:268px;z-index:150;display:none;width:420px;">
+        <form>
+            <table class="tableCenter" style="width:100%;">
+                <tr>
+                    <td colspan="5" class="dataTableHeading">Annotation Text</td>
+                </tr>
+                <tr>
+                    <td class="filterRowInfoText"><input type="text" id="textannotatvali" maxlength="20"
+                            onkeyup="checkForTextLength()" /></td>
+                    <td class="filterRowInfoText">
+                        <input type="button" class="button" id="textannotatoki" name="textannotatoki" value="Ok"
+                            onclick="closeTextAnnotate(1)">
+                        <input type="button" class="button" id="textannotatcanceli" name="textannotatcanceli"
+                            value="Cancel" onclick="closeTextAnnotate(0)">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <!-- QuickCapture main Library & Viewer -->
+    <script src="./build/QuickCapture.js"></script>
+
+    <!-- Support script for UI notifications -->
+    <script src="notific.js"></script>
+
+    <!--Demo application implentation scripts-->
+    <script src="script.js"></script>
+</body>
+
+</html>
