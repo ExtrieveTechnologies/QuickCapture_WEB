@@ -23,6 +23,50 @@ QuickCapture Web Scanning SDK-JS Imaging viewer library Specially designed for W
 - **Output Build**: Generate and compile the processed images for final output as normal and stamped TIF.
 - **Upload & Download**: Upload images to a server or download processed images from a server to the viewer.
 - **Viewer Instances**: Create multiple instances of image viewers for comparative analysis or multitasking.
+## How to Use
+
+Can download the web demo app from this GitHub repository, set it up in Visual Studio Code (VS Code), and run it locally using the Live Server extension.This will only works on **localhost/127.0.0.1**
+
+### Prerequisites
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [Live Server extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
+- [Git](https://git-scm.com/) (Optional)
+
+### Download and Setup
+
+#### Option 1: Using Git
+
+1. Clone the repository:
+   ```sh
+   git clone <REPO_URL>
+   ```
+2. Open the project in VS Code:
+   ```sh
+   cd <REPO_FOLDER_NAME>
+   code .
+   ```
+
+#### Option 2: Manual Download
+
+1. Download the repository as a ZIP file from GitHub and extract it.
+2. Open the extracted folder in VS Code:
+   - Select `File > Open Folder...` and choose the extracted folder.
+
+### Install Live Server Extension
+
+1. Open VS Code.
+2. Go to the Extensions view (click the Extensions icon in the Activity Bar).
+3. Search for "Live Server" and install it.
+
+### Run the Web App
+
+1. Open the HTML file you want to serve.
+2. Right-click on the HTML file and select "Open with Live Server".
+
+Or use the Command Palette:
+- Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) and type "Live Server: Open with Live Server".
+
+The web app will open in your default browser at `http://127.0.0.1:5500/`.
 
 ## Viewer Initialization
 
