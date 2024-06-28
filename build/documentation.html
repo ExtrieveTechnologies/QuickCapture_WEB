@@ -1,0 +1,588 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>quickcapture_web</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__left">
+    <div class="stackedit__toc">
+      
+<ul>
+<li><a href="#quickcapture.js-library-documentation">QuickCapture.js Library Documentation</a>
+<ul>
+<li><a href="#features">Features</a></li>
+<li><a href="#viewer-initialization">Viewer Initialization</a></li>
+<li><a href="#viewer-functionalities">Viewer Functionalities</a></li>
+<li><a href="#upload-from-viewer">Upload From Viewer</a></li>
+<li><a href="#http-twain-installer">Http Twain Installer</a></li>
+<li><a href="#second-viewer">Second Viewer</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="stackedit__right">
+    <div class="stackedit__html">
+      <p>Here’s the completed and corrected documentation in a standard JS library format:</p>
+<h1 id="quickcapture.js-library-documentation">QuickCapture.js Library Documentation</h1>
+<p><strong>QuickCapture</strong> is a robust web library designed for comprehensive image processing tasks. This library offers a wide range of functionalities to enhance, transform, and manage image files seamlessly. Below are the key features of QuickCapture:</p>
+<h2 id="features">Features</h2>
+<ul>
+<li><strong>Attach File</strong>: Easily attach image files from the local file system to the viewer for processing.</li>
+<li><strong>Scan from Scanner</strong>: Directly scan images using a connected scanner.</li>
+<li><strong>Navigation</strong>: Navigate to the first, last, previous, next page, and specific pages.</li>
+<li><strong>Transformations</strong>: Perform various image transformations such as rotation, despeckle, black &amp; white, grayscale, and invert image conversion.</li>
+<li><strong>Enhancement</strong>: Enhance image quality with tools for adjusting brightness, contrast, dilate, erosion, sharpen, and remove border.</li>
+<li><strong>Annotations</strong>: Include extract image, text annotate over image, fill color, and auto deskew.</li>
+<li><strong>Viewer Tools</strong>: Utilize zoom, pan, and magnifier tools for detailed image inspection.</li>
+<li><strong>Information</strong>: Access metadata and information about the image and files, get license information.</li>
+<li><strong>Output Build</strong>: Generate and compile the processed images for final output as normal and stamped TIF.</li>
+<li><strong>Upload &amp; Download</strong>: Upload images to a server or download processed images from a server to the viewer.</li>
+<li><strong>Viewer Instances</strong>: Create multiple instances of image viewers for comparative analysis or multitasking.</li>
+</ul>
+<h2 id="viewer-initialization">Viewer Initialization</h2>
+<h3 id="viewer-configuration">Viewer Configuration</h3>
+<p><em>Description:</em> The <strong>config</strong> allows users to modify some default options of the viewer such as <code>APP_NAME</code> to set the application name, <code>SERVICETIMEOUT</code> to set viewer timeout, <strong><code>LICENSE</code> to set the license string to activate the viewer (viewer will not work without a valid license)</strong>, <code>IS_HTTPS</code> to set using with HTTPS URL or not, <code>UI_CONFIG</code> to hide the default toolbar &amp; navbar of the viewer.</p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token keyword">const</span> config <span class="token operator">=</span> <span class="token punctuation">{</span>
+    APP_NAME<span class="token punctuation">:</span> <span class="token string">"TWAIN_VIEWER"</span><span class="token punctuation">,</span>
+    SERVICE_URL<span class="token punctuation">:</span> <span class="token string">"http://127.0.0.1:29213/libtwain/"</span><span class="token punctuation">,</span>
+    BASE_URL<span class="token punctuation">:</span> <span class="token string">"http://127.0.0.1"</span><span class="token punctuation">,</span>
+    URL_DIR<span class="token punctuation">:</span> <span class="token string">"/libtwain/"</span><span class="token punctuation">,</span>
+    PORTS<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token number">29213</span><span class="token punctuation">,</span> <span class="token number">55425</span><span class="token punctuation">,</span> <span class="token number">29215</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    ACTIVEPORT<span class="token punctuation">:</span> <span class="token number">29213</span><span class="token punctuation">,</span>
+    SERVICETIMEOUT<span class="token punctuation">:</span> <span class="token number">20</span><span class="token punctuation">,</span>
+    LICENSE<span class="token punctuation">:</span> licenseString<span class="token punctuation">,</span>
+    IS_HTTPS<span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+    <span class="token function">GetServiceURL</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>BASE_URL <span class="token operator">+</span> <span class="token string">":"</span> <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>ACTIVEPORT <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>URL_DIR<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    UI_CONFIG<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        TOOLBAR<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+        NAVBAR<span class="token punctuation">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="viewer-initialization--callback-events">Viewer Initialization &amp; Callback Events</h3>
+<p><em>Description:</em> The <code>initScanViewer</code> function initializes the viewer class with the class object named <strong>QuickCaptureInterface</strong> and license activation along with allowed input file via filter and multi-file select enable or disable. Callback events trigger respective events.</p>
+<h4 id="common-events">Common Events</h4>
+<ol>
+<li><code>AcquiredImage</code>: Triggered for every image acquired.</li>
+<li><code>AcquisitionCompleted</code>: Triggered for every file acquisition session complete.</li>
+<li><code>URLOperationStarted</code>: Triggered once the upload or download process is started.</li>
+<li><code>URLOperationProgress</code>: Triggered while image upload or download is in progress.</li>
+<li><code>URLOperationCompleted</code>: Triggered once the image download or upload process is completed.</li>
+<li><code>URLOperationError</code>: Triggered if any error happens while the image download or upload process.</li>
+<li><code>AnnotationDrawn</code>: Triggered once the annotation over the image is done (with coordinates).</li>
+</ol>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token comment">// Viewer init with registering callback events</span>
+<span class="token keyword">let</span> initScanViewer <span class="token operator">=</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> ImgRootDivID <span class="token operator">=</span> <span class="token string">"ImgViewerRoot"</span><span class="token punctuation">;</span>
+    
+    <span class="token keyword">let</span> QuickCaptureInterface <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">QuickCapture</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">await</span> QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span>ImgRootDivID<span class="token punctuation">,</span> config<span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">let</span> allowedFiles <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"IMAGE + PDF Files"</span><span class="token punctuation">,</span> <span class="token string">"*.png;*.jpeg;*.jpg;*.tiff;*.tif;*.pdf;*.bmp;"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">EnableMultiSelect</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">SetInputFileFilter</span><span class="token punctuation">(</span>allowedFiles<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">RegisterEvent</span><span class="token punctuation">(</span><span class="token string">"URLOperationStarted"</span><span class="token punctuation">,</span> URLOperation_Started<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">RegisterEvent</span><span class="token punctuation">(</span><span class="token string">"URLOperationProgress"</span><span class="token punctuation">,</span> URLOperation_Progress<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">RegisterEvent</span><span class="token punctuation">(</span><span class="token string">"URLOperationCompleted"</span><span class="token punctuation">,</span> URLOperation_Completed<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">RegisterEvent</span><span class="token punctuation">(</span><span class="token string">"URLOperationError"</span><span class="token punctuation">,</span> URLOperation_Error<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">RegisterEvent</span><span class="token punctuation">(</span><span class="token string">"AcquisitionCompleted"</span><span class="token punctuation">,</span> Acquisition_Completed<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">RegisterEvent</span><span class="token punctuation">(</span><span class="token string">"AcquiredImage"</span><span class="token punctuation">,</span> Acquired_Image<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">RegisterEvent</span><span class="token punctuation">(</span><span class="token string">"AnnotationDrawn"</span><span class="token punctuation">,</span> Annotation_Drawn<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    QuickCaptureInterface<span class="token punctuation">.</span>Library<span class="token punctuation">.</span><span class="token function">ClearAndSetAppID</span><span class="token punctuation">(</span><span class="token string">"-1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="viewer-functionalities">Viewer Functionalities</h2>
+<h3 id="attach-file">Attach File</h3>
+<h4 id="append-from-file">Append From File</h4>
+<p><em>Description:</em> The <code>AppendFromFile</code> functionality allows users to append any documents to the viewer. This is useful for incorporating any images quickly and efficiently in the document viewer.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">AppendFromFile</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="insert-before-page">Insert Before Page</h4>
+<p><em>Description:</em> The <code>InsertBeforeCurrentPage</code> functionality allows users to insert pages before the current page in the viewer. This is useful for adding new pages at the beginning of the current page in the document viewer.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">InsertBeforeCurrentPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="insert-after-page">Insert After Page</h4>
+<p><em>Description:</em> The <code>InsertAfterCurrentPage</code> functionality allows users to insert pages after the current page in the viewer. This is useful for adding new pages immediately following the current page in the document viewer.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">InsertAfterCurrentPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="replace-current-page">Replace Current Page</h4>
+<p><em>Description:</em> The <code>InsertAtCurrentPage</code> functionality allows users to replace the current page in the viewer with a new document from the file system. This is useful for updating or correcting specific pages in the existing document viewer.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">InsertAtCurrentPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="append-from-folder">Append From Folder</h4>
+<p><em>Description:</em> The <code>AppendFromFolder</code> functionality allows users to append all documents from a specified folder to the viewer. This is useful for quickly incorporating a large number of files from a directory into the document viewer.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">AppendFromFolder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="scanner">Scanner</h3>
+<h4 id="select-scanner-device">Select Scanner Device</h4>
+<p><em>Description:</em> The <code>SelectSource</code> functionality allows users to select a scanner device from which to capture images or documents. This is essential for setting up the desired scanner before performing any scanning operations or selecting at the time of performing a scan from the scanner.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">SelectSource</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="append-from-scanner">Append from Scanner</h4>
+<p><em>Description:</em> The <code>AppendFromScanner</code> functionality enables users to append scanned documents directly into the application from a connected scanner. This feature is essential for capturing physical documents and integrating them seamlessly into digital workflows.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">AppendFromScanner</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="insert-before-page-1">Insert Before Page</h4>
+<p><em>Description:</em> The <code>InsertBeforeFromScanner</code> functionality allows users to insert scanned documents before the current page in the document viewer. This feature is useful for seamlessly integrating scanned content into existing digital documents at specific locations.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">InsertBeforeFromScanner</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="insert-after-page-1">Insert After Page</h4>
+<p><em>Description:</em> The <code>InsertAfterFromScanner</code> functionality allows users to insert scanned documents after the current page in the document viewer. This feature is useful for seamlessly integrating scanned content into existing digital documents immediately following a specific location.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">InsertAfterFromScanner</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="replace-current-page-1">Replace Current Page</h4>
+<p><em>Description:</em> The <code>ReplacePageFromScanner</code> functionality allows users to replace the current page in the document viewer with a scanned document. This feature is useful for updating existing digital documents with newly scanned content.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">ReplacePageFromScanner</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="navigations">Navigations</h3>
+<h4 id="first-page">First Page</h4>
+<p><em>Description:</em> The <code>NavigateToPage("firstpage")</code> functionality allows users to navigate to the first page of the document in the viewer. This feature is useful for quickly returning to the beginning of a document, especially when dealing with multi-page documents.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">NavigateToPage</span><span class="token punctuation">(</span><span class="token string">"firstpage"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="previous-page">Previous Page</h4>
+<p><em>Description:</em> The <code>NavigateToPage("prevpage")</code> functionality allows users to navigate to the previous page of the document in the viewer. This feature is useful for sequentially reviewing or editing multi-page documents.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">NavigateToPage</span><span class="token punctuation">(</span><span class="token string">"prevpage"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="next-page">Next Page</h4>
+<p><em>Description:</em> The <code>NavigateToPage("nextpage")</code> functionality allows users to navigate to the next page of the document in the viewer or editor interface. This feature is useful for sequentially reviewing or editing multi-page documents.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">NavigateToPage</span><span class="token punctuation">(</span><span class="token string">"nextpage"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="last-page">Last Page</h4>
+<p><em>Description:</em> The <code>NavigateToPage("lastpage")</code> functionality allows users to navigate to the last page of the document in the viewer. This feature is useful for quickly accessing the end of multi-page documents.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">NavigateToPage</span><span class="token punctuation">(</span><span class="token string">"lastpage"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="goto-page">Goto Page</h4>
+<p><em>Description:</em> The <code>NavigateToPage("gotopage", pageNo)</code> functionality allows users to navigate to a specific page of the document in the viewer. This feature is useful for quickly accessing a particular page within multi-page documents.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token keyword">var</span> pageNo <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span> <span class="token comment">//Replace with the desired page number</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">NavigateToPage</span><span class="token punctuation">(</span><span class="token string">"gotopage"</span><span class="token punctuation">,</span> pageNo<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>pageNo</code>: An integer</li>
+</ul>
+<p>parameter representing the page number to which the user wants to navigate.</p>
+<h3 id="transformations">Transformations</h3>
+<h4 id="invert-image">Invert Image</h4>
+<p><em>Description:</em> The <code>InvertPage</code> function inverts the colors of the current page in the document viewer.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">InvertPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="black-and-white">Black and White</h4>
+<p><em>Description:</em> The <code>SetForBlackandWhite</code> functionality converts the current page in the document viewer to a black and white image. <strong>Both color &amp; grayscale images are supported</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">SetForBlackandWhite</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="gray-image">Gray Image</h4>
+<p><em>Description:</em> The <code>SetForGray</code> function converts the current page in the document viewer to a grayscale image. <strong>Only color images are supported</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">SetForGray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="auto-despeckle">Auto Despeckle</h4>
+<p><em>Description:</em> The <code>DespecklePage</code> functionality automatically removes small specks, noise, or artifacts from a scanned document or image to enhance their clarity and quality. <strong>Supports black &amp; white images</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">DespecklePage</span><span class="token punctuation">(</span>ScanConfig<span class="token punctuation">.</span>DespeckleQuality<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>ScanConfig.DespeckleQuality</code> (int): Level or intensity of the despeckling process applied to remove specks, noise, or artifacts from the scanned document or image. Allowed values range from 0-100.</li>
+<li><code>Method</code>(int): Allowed to pass 1 by default in this parameter.</li>
+</ul>
+<h4 id="rotate-image">Rotate Image</h4>
+<p><em>Description:</em> The <code>Rotate</code> functionality rotates the current page in the document viewer by a specified angle in degrees clockwise. This is useful for adjusting the orientation of images or documents that need to be viewed or printed in a different orientation.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">Rotate</span><span class="token punctuation">(</span>rangle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>rangle</code> (float): Angle of rotation in degrees. Positive values rotate clockwise, while negative values rotate counterclockwise.</li>
+</ul>
+<h3 id="enhancements">Enhancements</h3>
+<h4 id="brightness">Brightness</h4>
+<p><em>Description:</em> The <code>setBrightness</code> function adjusts the brightness of the current image in the document viewer. This is useful for improving visibility or adjusting the overall lightness of the image. <strong>Supports only color images</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">setBrightness</span><span class="token punctuation">(</span>bvalue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>bvalue</code>: A number between -50 and +50.</li>
+</ul>
+<h4 id="contrast">Contrast</h4>
+<p><em>Description:</em> The <code>setContrast</code> functionality adjusts the contrast of the current image in the document viewer. This is useful for enhancing the difference in intensity between the light and dark areas of the image. <strong>Supports only color images</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">setContrast</span><span class="token punctuation">(</span>cvalue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>cvalue</code>: A number between -50 and +50.</li>
+</ul>
+<h4 id="smoothing">Smoothing</h4>
+<p><em>Description:</em> The <code>setSmoothing</code> functionality typically denotes an enhancement process aimed at reducing noise or smoothing out abrupt transitions in the current image in the document viewer. <strong>Supports color and grayscale images</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">setSmoothing</span><span class="token punctuation">(</span>svalue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>svalue</code>: A number between -50 and +50.</li>
+</ul>
+<h4 id="dilate">Dilate</h4>
+<p><em>Description:</em> Dilation functionality adds pixels to the boundaries of objects in an image. <strong>Supports color and grayscale images</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">Dilate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="erosion">Erosion</h4>
+<p><em>Description:</em> Erosion functionality removes pixels on object boundaries. <strong>Supports color and grayscale images</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">Erode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="sharpen">Sharpen</h4>
+<p><em>Description:</em> It sharpens the current image in the viewer, enhancing edge contrast and making the image appear clearer. <strong>Supports color and grayscale images</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">Sharpen</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="remove-border">Remove Border</h4>
+<p><em>Description:</em> It helps in removing borders from an image typically by identifying and cropping out unwanted areas around the edges of the image. <strong>Supports all color, grayscale, black &amp; white images</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">RemoveBorder</span><span class="token punctuation">(</span>ScanConfig<span class="token punctuation">.</span>minwidth<span class="token punctuation">,</span> ScanConfig<span class="token punctuation">.</span>minheight<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>ScanConfig.minwidth</code>: Width of removing edge (pass the same value for both width and height).</li>
+<li><code>ScanConfig.minheight</code>: Height of removing edge (pass the same value for both width and height).</li>
+</ul>
+<h3 id="annotations">Annotations</h3>
+<h4 id="extract">Extract</h4>
+<p><em>Description:</em> The <code>DoExtract</code> functionality crops a selected area specified by an annotation and appends it to the desired place in the document viewer. This operation allows users to extract specific content from a document or image and add it sequentially to the existing document viewer.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token comment">// To trigger annotation draw</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">DrawAnnotation</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// In Registered Annotate event</span>
+<span class="token keyword">await</span> QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">DoExtract</span><span class="token punctuation">(</span>ExtLeft<span class="token punctuation">,</span> ExtTop<span class="token punctuation">,</span> ExtRight<span class="token punctuation">,</span> ExtBottom<span class="token punctuation">,</span> placement<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>ExtLeft, ExtTop, ExtRight, ExtBottom</code>: Annotate callback event will provide all these 4 coordinates; pass the same to TextAnnotate.</li>
+<li><code>placement</code>: Pass any one desired placement: “append, insertbefore, insertafter, overwrite”.</li>
+</ul>
+<h4 id="text-annotate">Text Annotate</h4>
+<p><em>Description:</em> The <code>TextAnnotate</code> functionality enables users to annotate documents or images by adding text at a specified location. This feature is useful for adding notes, comments, or labels directly onto the document or image content. Need to specify the operation as a “textannotation”.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token comment">// To trigger annotation draw</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">DrawAnnotation</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// In Registered Annotate event</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">TextAnnotate</span><span class="token punctuation">(</span>ExtLeft<span class="token punctuation">,</span> ExtTop<span class="token punctuation">,</span> ExtRight<span class="token punctuation">,</span> ExtBottom<span class="token punctuation">,</span> Msg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>ExtLeft, ExtTop, ExtRight, ExtBottom</code>: Annotate callback event will provide all these 4 coordinates; pass the same to TextAnnotate.</li>
+<li><code>Msg</code>: Pass the desired message to print over the selected area (allowed 20 characters max).</li>
+</ul>
+<h4 id="fill-color-inside">Fill Color Inside</h4>
+<p><em>Description:</em> The <code>DoWhiteOut</code> functionality allows users to fill a specified area inside an annotation with white color. This functionality is useful for wiping out specific content in images. <strong>Supports black &amp; white images</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token comment">// To trigger annotation draw</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">DrawAnnotation</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// In Registered Annotate event</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">DoWhiteOut</span><span class="token punctuation">(</span>ExtLeft<span class="token punctuation">,</span> ExtTop<span class="token punctuation">,</span> ExtRight<span class="token punctuation">,</span> ExtBottom<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>ExtLeft, ExtTop, ExtRight, ExtBottom</code>: Annotate callback event will provide all these 4 coordinates; pass the same to TextAnnotate.</li>
+</ul>
+<h4 id="fill-color-outside">Fill Color Outside</h4>
+<p><em>Description:</em> The <code>DoBorderWhiteOut</code> functionality allows users to fill the area outside a specified annotation with white color. This functionality is useful for wiping out contents in images outside the selected area. <strong>Supports black &amp; white images</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token comment">// To trigger annotation draw</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">DrawAnnotation</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// In Registered Annotate event</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">DoBorderWhiteOut</span><span class="token punctuation">(</span>ExtLeft<span class="token punctuation">,</span> ExtTop<span class="token punctuation">,</span> ExtRight<span class="token punctuation">,</span> ExtBottom<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>ExtLeft, ExtTop, ExtRight, ExtBottom</code>: Annotate callback event will provide all these 4 coordinates; pass the same to TextAnnotate.</li>
+</ul>
+<h4 id="auto-deskew">Auto Deskew</h4>
+<p><em>Description:</em> The <code>DeskewPage</code> function automatically detects and corrects the skew angle of the current page in the document viewer. This is useful for straightening tilted images and aligning images. <strong>Supports black &amp; white images</strong></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">DeskewPage</span><span class="token punctuation">(</span>ScanConfig<span class="token punctuation">.</span>MaxDeskewAngle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>maxDeskewAngle</code> (int): The maximum angle in degrees within which the function will attempt to deskew the image.</li>
+</ul>
+<h3 id="zoom--pan">Zoom / Pan</h3>
+<h4 id="set-zoom-factor">Set Zoom Factor</h4>
+<p><em>Description:</em> The <code>SetZoomFactorWithZoom</code> function sets the zoom level of the document viewer based on a specified percentage. This allows users to zoom in or out to view the document at their desired scale, providing better control over document viewing and navigation.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">SetZoomFactorWithZoom</span><span class="token punctuation">(</span>scale<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>scale</code> (int): The scale ranges 0% to 300%, by default set to 0%.</li>
+</ul>
+<h4 id="set-zoom-mouse">Set Zoom Mouse</h4>
+<p><em>Description:</em> The <code>SetMouseTool(1)</code> functionality allows users to zoom in and out of the document using the mouse. When activated, users can use the mouse to zoom in and out on the document, providing a more interactive and user-friendly experience for viewing document details.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">SetMouseTool</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="set-pan-mouse">Set Pan Mouse</h4>
+<p><em>Description:</em> The <code>SetMouseTool(2)</code> functionality allows users to grab and drag the document within the viewer using the mouse. When activated, users can click and drag the document to move around the content, making it easier to navigate large documents without using scrollbars.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">SetMouseTool</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="set-magnifier">Set Magnifier</h4>
+<p><em>Description:</em> The <code>SetMouseTool(3)</code> functionality enables a magnifying tool within the document viewer. This allows users to zoom in on specific areas of the document by hovering the mouse over them, providing a detailed view of small or intricate parts of the document. For zooming specific part use <code>ctrl + mouse scroll</code>.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">SetMouseTool</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="reset-mouse-tool">Reset Mouse Tool</h4>
+<p><em>Description:</em> The <code>ResetMouseTool</code> functionality will reset all active mouse tools, such as zoom, pan, and magnifier tools.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">ResetMouseTool</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="file-information">File Information</h3>
+<h4 id="show-image-info">Show Image Info</h4>
+<p><em>Description:</em> The</p>
+<p><code>GetImageInfo</code> functionality provides information about the currently displayed image or the page number passed. This feature is useful for accessing details about the particular image/page.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">GetImageInfo</span><span class="token punctuation">(</span>QuickCaptureInterface<span class="token punctuation">.</span>CurrentPage<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>page</code> (int): Pass page number to get image info, by default set to current page.</li>
+</ul>
+<h4 id="show-file-info">Show File Info</h4>
+<p><em>Description:</em> The <code>GetFileInfo</code> functionality provides comprehensive information about the entire files currently loaded in the viewer. This feature is useful for accessing all files appended in the document viewer.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">GetFileInfo</span><span class="token punctuation">(</span>index<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>index</code> (int): Pass file index number to get file info, by default set to all file list.</li>
+</ul>
+<h4 id="set-page-attribute">Set Page Attribute</h4>
+<p><em>Description:</em> The <code>SetPageAttribute</code> functionality provides access to set a unique identifier from the client app to identify a particular page while performing some actions.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">SetPageAttribute</span><span class="token punctuation">(</span>attr<span class="token punctuation">,</span> page<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>attr</code> (string): Pass any string identifier.</li>
+<li><code>page</code> (int): Pass page number in which this attribute needs to be set.</li>
+</ul>
+<h4 id="get-page-attribute">Get Page Attribute</h4>
+<p><em>Description:</em> The <code>GetPageAttribute</code> functionality provides access to get a unique identifier which is set previously while performing some actions.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">GetPageAttribute</span><span class="token punctuation">(</span>page<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>page</code> (int): Pass page number to get the attribute.</li>
+</ul>
+<h4 id="get-license-info">Get License Info</h4>
+<p><em>Description:</em> The <code>getServiceInfo</code> functionality retrieves information about the currently activated license. This feature is useful for accessing details related to the licensing of the application, such as license type, expiration date, and other relevant information.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">getServiceInfo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="remove-page">Remove Page</h3>
+<h4 id="discard-current-page">Discard Current Page</h4>
+<p><em>Description:</em> The <code>DiscardPage</code> functionality allows users to remove or discard the currently displayed page from the document viewer. This feature is useful for document editing and management tasks where removing specific pages is necessary.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">DiscardPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="discard-all-pages">Discard All Pages</h4>
+<p><em>Description:</em> The <code>Discard All Pages</code> functionality allows users to remove or discard all pages from the document viewer and library. This feature is useful for clearing out the entire document set and library in one operation.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">ClearLibrary</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">ClearContents</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="output-build">Output Build</h3>
+<h4 id="save-normal-tif">Save Normal TIF</h4>
+<p><em>Description:</em> The <code>CopyOutput</code> functionality allows users to save the current document or image as a normal single TIF file format. This feature is useful for exporting documents or images in a standard and compressed format.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token keyword">var</span> Out <span class="token operator">=</span> QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">GetNewOutputObj</span><span class="token punctuation">(</span><span class="token string">"output_file"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">AddToOutputObj</span><span class="token punctuation">(</span>Out<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> s <span class="token operator">=</span> <span class="token keyword">await</span> Out<span class="token punctuation">.</span><span class="token function">FileSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> ret <span class="token operator">=</span> <span class="token keyword">await</span> QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">CopyOutput</span><span class="token punctuation">(</span>Out<span class="token punctuation">,</span> <span class="token string">"output_file.tif"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="save-stamped-tif">Save Stamped TIF</h4>
+<p><em>Description:</em> The <code>Save Stamped TIF</code> functionality allows users to save the current document or image with a stamp applied. This feature is useful for adding text stamps, such as watermarks or annotations, to documents before generating output TIF.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token keyword">var</span> Out <span class="token operator">=</span> QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">GetNewOutputObj</span><span class="token punctuation">(</span><span class="token string">"stamping_output"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">initStamping</span><span class="token punctuation">(</span>StampingConfig<span class="token punctuation">.</span>STAMPING_CONFIG<span class="token punctuation">,</span> StampingConfig<span class="token punctuation">.</span>STAMPING_CONFIG<span class="token punctuation">.</span>TWAIN<span class="token punctuation">,</span> StampingConfig<span class="token punctuation">.</span>STAMPING_CONFIG<span class="token punctuation">.</span>USER_INFO<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> stamp <span class="token operator">=</span> QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">getStampingObject</span><span class="token punctuation">(</span><span class="token number">0.04</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">0.05</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">AddToOutputObj</span><span class="token punctuation">(</span>Out<span class="token punctuation">)</span><span class="token punctuation">;</span>
+Out<span class="token punctuation">.</span><span class="token function">SetStampingInfo</span><span class="token punctuation">(</span>stamp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> s <span class="token operator">=</span> <span class="token keyword">await</span> Out<span class="token punctuation">.</span><span class="token function">FileSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> ret <span class="token operator">=</span> <span class="token keyword">await</span> QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">CopyOutput</span><span class="token punctuation">(</span>Out<span class="token punctuation">,</span> <span class="token string">"stamped_output.tif"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="get-file-name--size">Get File Name &amp; Size</h4>
+<p><em>Description:</em> The <code>FileSize</code> and <code>FileName</code> functionality retrieves and displays information about the current output file, which includes its name and size.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token keyword">var</span> Out <span class="token operator">=</span> QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">GetNewOutputObj</span><span class="token punctuation">(</span><span class="token string">"output_tif_file"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">AddToOutputObj</span><span class="token punctuation">(</span>Out<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> fs <span class="token operator">=</span> <span class="token keyword">await</span> Out<span class="token punctuation">.</span><span class="token function">FileSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> fn <span class="token operator">=</span> <span class="token keyword">await</span> Out<span class="token punctuation">.</span><span class="token function">FileName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="print-current-page">Print Current Page</h4>
+<p><em>Description:</em> The <code>PrintPage</code> functionality allows users to print the currently displayed page from the document viewer. This feature is useful for generating physical copies of documents directly from the application.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript">QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">PrintPage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h3 id="upload--download">Upload / Download</h3>
+<h4 id="download-to-viewer">Download To Viewer</h4>
+<p><em>Description:</em> The <code>downloadFiles</code> functionality allows users to download a file and display it directly in the viewer of the application. This feature is useful for fetching documents or images from external sources or from the server and presenting them within the application interface.</p>
+<p><em>Usage: From direct image or file link</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token keyword">var</span> downloadurl <span class="token operator">=</span> <span class="token string">"https://example.com/image.pdf"</span><span class="token punctuation">;</span>
+QuickCaptureInterface<span class="token punctuation">.</span>Library<span class="token punctuation">.</span><span class="token function">SetCurrentAppID</span><span class="token punctuation">(</span><span class="token string">"-1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+QuickCaptureInterface<span class="token punctuation">.</span>Viewer<span class="token punctuation">.</span>Contents<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span>downloadurl<span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">"-1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">LimitPageRange</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">NavigateToPage</span><span class="token punctuation">(</span><span class="token string">"firstpage"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><em>Usage: From server</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token keyword">var</span> downloadurl <span class="token operator">=</span> <span class="token string">"https://example.com/image.pdf"</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> headerData <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token string">"x-quickcapture-token"</span><span class="token punctuation">:</span> <span class="token string">"token_value"</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> useServiceToDownload <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> httpMode <span class="token operator">=</span> <span class="token string">"get"</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> requestData <span class="token operator">=</span> <span class="token punctuation">{</span> name<span class="token punctuation">:</span> <span class="token string">'data'</span><span class="token punctuation">,</span> data<span class="token punctuation">:</span> JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> uid<span class="token punctuation">:</span> <span class="token number">123456</span><span class="token punctuation">,</span> imagepool<span class="token punctuation">:</span> <span class="token string">"A"</span> <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">let</span> downRes <span class="token operator">=</span> <span class="token keyword">await</span> QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">downloadFiles</span><span class="token punctuation">(</span>downloadurl<span class="token punctuation">,</span> httpMode<span class="token punctuation">,</span> requestData<span class="token punctuation">,</span> headerData<span class="token punctuation">,</span> useServiceToDownload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//if download is via service, once all images downloaded completely then download complete will capture by URLOperationCompleted event</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span>downRes<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+<span class="token comment">//here only json reponse data can be found</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"Downloaded file to viewer"</span><span class="token punctuation">,</span> downRes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span>
+
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li>
+<p><code>httpMode</code>: need to specify whether using http mode is get or post</p>
+</li>
+<li>
+<p><code>downloadurl</code>: need to give image download url to get image file</p>
+</li>
+<li>
+<p><code>requestData</code>: need to specify payload data in key value object</p>
+</li>
+<li>
+<p><code>headerData</code>: need to send headers as shown in above example</p>
+</li>
+<li>
+<p><code>useServiceToDownload</code>: set this value to true always</p>
+</li>
+</ul>
+<p>Here is the corrected and completed remaining part of the documentation:</p>
+<h2 id="upload-from-viewer">Upload From Viewer</h2>
+<p><em>Description:</em> The <code>Upload From Viewer</code> functionality enables users to upload an image or document from the viewer to the server as image/TIF. This feature is useful for uploading files directly from the viewer to the server for further processing or viewing.</p>
+<p><em>Function Name:</em> <code>uploadFiles</code></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token comment">// Required data to upload call trigger</span>
+<span class="token keyword">let</span> uploadUrl <span class="token operator">=</span> <span class="token string">"https://eo6lbhayb3d8qk8.m.pipedream.net"</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> requestData <span class="token operator">=</span> <span class="token punctuation">{</span> name<span class="token punctuation">:</span> <span class="token string">'data'</span><span class="token punctuation">,</span> data<span class="token punctuation">:</span> JSON<span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span> uid<span class="token punctuation">:</span> <span class="token number">123456</span><span class="token punctuation">,</span> imagepool<span class="token punctuation">:</span> <span class="token string">"A"</span><span class="token punctuation">,</span> timestamp<span class="token punctuation">:</span> <span class="token number">1645123545</span> <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> headerData <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token string">"x-quickcapture-token"</span><span class="token punctuation">:</span> <span class="token string">"1sdGFH5k4KUJH45JKjf4KGHsK54JHsf54"</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> useServiceToUpload <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> httpMode <span class="token operator">=</span> <span class="token string">"post"</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Create a new upload output object</span>
+<span class="token keyword">var</span> Out <span class="token operator">=</span> QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">GetNewOutputObj</span><span class="token punctuation">(</span><span class="token string">"upload_file"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Add all images from viewer to output object</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">AddToOutputObj</span><span class="token punctuation">(</span>Out<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Upload output from viewer to server</span>
+<span class="token keyword">let</span> upRes <span class="token operator">=</span> <span class="token keyword">await</span> QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">uploadFiles</span><span class="token punctuation">(</span>Out<span class="token punctuation">,</span> httpMode<span class="token punctuation">,</span> uploadUrl<span class="token punctuation">,</span> requestData<span class="token punctuation">,</span> headerData<span class="token punctuation">,</span> useServiceToUpload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Check for desired response from server, then do further process</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>useServiceToUpload<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// If upload is via service, then response will be captured by URLOperationCompleted event</span>
+    upRes <span class="token operator">?</span> <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Image upload success\nImage Id: "</span> <span class="token operator">+</span> imageid<span class="token punctuation">)</span> <span class="token punctuation">:</span> <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Image upload failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment">// If upload is via browser, then response will return here itself</span>
+    upRes <span class="token operator">?</span> <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Image upload success\nImage Id: "</span> <span class="token operator">+</span> upRes<span class="token punctuation">.</span>IMAGEID<span class="token punctuation">)</span> <span class="token punctuation">:</span> <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Image upload failed"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code>Out</code>: Output object created from viewer needs to be passed here.</li>
+<li><code>httpMode</code>: Specify whether using HTTP mode is GET or POST.</li>
+<li><code>uploadUrl</code>: Provide the image upload URL.</li>
+<li><code>requestData</code>: Specify payload data in key-value object.</li>
+<li><code>headerData</code>: Send headers as shown in the above example.</li>
+<li><code>useServiceToUpload</code>: Set this to false only if you want to use direct browser upload.</li>
+</ul>
+<h2 id="http-twain-installer">Http Twain Installer</h2>
+<p><strong>Download Twain Installer</strong></p>
+<p><em>Description:</em> The <code>HTTP Twain Installer</code> functionality allows users to initiate the download of a TWAIN installer directly from an HTTP source. This feature is crucial for setting up or updating the TWAIN driver necessary for interfacing with imaging devices, such as scanners or cameras, from within the application.</p>
+<p><em>Function Name:</em> <code>DownloadInstaller</code></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token comment">// Example usage to download the TWAIN installer</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">DownloadInstaller</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><strong>Trigger Service From Web</strong></p>
+<p><em>Description:</em> The <code>Trigger Service from Web</code> functionality allows users to initiate a request from a web-based interface to check if a specific application is installed, and if installed, it will trigger the service if it is in an inactive state.</p>
+<p><em>Function Name:</em> <code>triggerHttpTwain</code></p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token comment">// To check if service is running or not, if installed will trigger service</span>
+QuickCaptureInterface<span class="token punctuation">.</span><span class="token function">triggerHttpTwain</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h2 id="second-viewer">Second Viewer</h2>
+<p><strong>Open Viewer Instance</strong></p>
+<p><em>Description:</em> The <code>Open Viewer Instance</code> functionality allows users to open a new instance of the viewer within the application. This feature is useful for simultaneously viewing multiple documents or images side by side or for comparing two documents.</p>
+<p><em>Usage:</em></p>
+<pre class=" language-javascript"><code class="prism  language-javascript"><span class="token comment">// HTML new viewer element id to create viewer instance</span>
+<span class="token keyword">let</span> ImgRootDivID <span class="token operator">=</span> <span class="token string">"ImgViewerRoot2"</span><span class="token punctuation">;</span>
+
+QuickCaptureInterface1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">QuickCapture</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">await</span> QuickCaptureInterface1<span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span>ImgRootDivID<span class="token punctuation">,</span> config<span class="token punctuation">,</span> QuickCaptureInterface<span class="token punctuation">.</span>jsImageWizViewer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Use existing viewer jsImageWizViewer to get instance viewer</span>
+QuickCaptureInterface1<span class="token punctuation">.</span>SingleDocument <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Adding content from document library to instance viewer</span>
+QuickCaptureInterface1<span class="token punctuation">.</span><span class="token function">AddLibToContent</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"-1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Navigate to first page in instance viewer</span>
+QuickCaptureInterface1<span class="token punctuation">.</span><span class="token function">NavigateToPage</span><span class="token punctuation">(</span><span class="token string">"firstpage"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>This completes the documentation for the QuickCapture.js library, including all functionalities and corrected details in a standard JS library format.</p>
+
+    </div>
+  </div>
+</body>
+
+</html>
