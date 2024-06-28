@@ -25,7 +25,9 @@ QuickCapture Web Scanning SDK-JS Imaging viewer library Specially designed for W
 - **Viewer Instances**: Create multiple instances of image viewers for comparative analysis or multitasking.
 ## How to Use
 
-Can download the web demo app from this GitHub repository, set it up in Visual Studio Code (VS Code), and run it locally using the Live Server extension.This will only works on **localhost/127.0.0.1**
+You can download the web demo app from this GitHub repository, set it up in Visual Studio Code (VS Code), and run it locally using the Live Server extension. Note that it will only work on localhost/127.0.0.1.
+
+For the viewer to function, a Windows-based service is required for imaging-based native operations. The viewer will attempt to download this service automatically. If the automatic download fails, you will need to install the service manually. You can download it manually from  :- [HttpTwain Windows Service](https://expack.extrieve.in/share/httptwain/v2.0.10/978872ff3242cbadd2dcee50b2ecf150e7db06583163802c2981c8be01271801/HttpTwainSetup.msi))
 
 ### Prerequisites
 - [Visual Studio Code](https://code.visualstudio.com/)
